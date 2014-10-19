@@ -48,17 +48,10 @@ namespace Sitecore.ContentSearch.Spatial.Query
                 Circle circle = ctx.MakeCircle((double)node.Longitude,(double)node.Latitude, distance);
 
                 var spatialArgs = new SpatialArgs(SpatialOperation.Intersects, circle);
-                var dq = strategy.MakeQuery(spatialArgs);
-
-                ValueSource valueSource = strategy.MakeDistanceValueSource(circle.GetCenter());
-                FunctionQuery sortQuery = new FunctionQuery(valueSource);
-            
-                ValueSourceFilter vsf = new ValueSourceFilter(new QueryWrapperFilter(dq), valueSource, 0, distance);
-                var filteredSpatial = new FilteredQuery(new MatchAllDocsQuery(), vsf);
-                var spatialRankingQuery = new FunctionQuery(valueSource);
+                var dq = strategy.MakeQueryDistanceScore(spatialArgs);
                 BooleanQuery bq = new BooleanQuery();
-                bq.Add(filteredSpatial, Occur.MUST);
-                bq.Add(spatialRankingQuery, Occur.MUST);
+
+                bq.Add(dq, Occur.MUST);
 
                 return bq;
             }

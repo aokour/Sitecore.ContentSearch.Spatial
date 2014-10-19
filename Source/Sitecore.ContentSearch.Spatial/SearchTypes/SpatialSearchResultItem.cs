@@ -26,5 +26,6 @@ namespace Sitecore.ContentSearch.Spatial.SearchTypes
         {
             return true;
         }
+
     }
 }

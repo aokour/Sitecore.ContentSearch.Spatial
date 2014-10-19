@@ -24,6 +24,11 @@ namespace Sitecore.ContentSearch.Spatial.Indexing
 {
     public class LuceneSpatialDocumentBuilder : LuceneDocumentBuilder
     {
+        private string fieldNameX;
+        private string fieldNameY;
+        public static string SUFFIX_X = "__lng";
+        public static string SUFFIX_Y = "__ltd";
+        public int precisionStep;
         private SpatialConfigurations spatialConfigurations;
         public LuceneSpatialDocumentBuilder(IIndexable indexable, IProviderUpdateContext context)
             : base(indexable, context)
@@ -73,16 +78,37 @@ namespace Sitecore.ContentSearch.Spatial.Indexing
             foreach (var f in strategy.CreateIndexableFields(shape))
             {
                 if (f != null)
-                { 
+                {
                     pointFields.Add(f);
                 }
             }
+            //Create storable fields
+            NumericField fieldX = new NumericField(this.fieldNameX, this.precisionStep, Field.Store.YES, false)
+            {
+                OmitNorms = true,
+                OmitTermFreqAndPositions = true
+            };
+            fieldX.SetDoubleValue(lng);
+
+            NumericField fieldY = new NumericField(this.fieldNameY, this.precisionStep, Field.Store.YES, true)
+            {
+                OmitNorms = true,
+                OmitTermFreqAndPositions = true
+            };
+            fieldY.SetDoubleValue(lat);
             
+            pointFields.Add(fieldX);
+            pointFields.Add(fieldY);
+
             return pointFields;
         }
 
         private void BuildSettings()
         {
+            this.precisionStep = 8;
+            this.fieldNameX = Sitecore.ContentSearch.Spatial.Common.Constants.LocationFieldName + SUFFIX_X;
+            this.fieldNameY = Sitecore.ContentSearch.Spatial.Common.Constants.LocationFieldName + SUFFIX_Y;
+
             spatialConfigurations = new SpatialConfigurations();
             spatialConfigurations.LocationSettings = new List<LocationSettings>();
             XmlNodeList configs = Factory.GetConfigNodes("contentSearchSpatial/IncludeTemplates/Template");
@@ -109,7 +135,5 @@ namespace Sitecore.ContentSearch.Spatial.Indexing
                 spatialConfigurations.LocationSettings.Add(locationSetting);
             }
         }
-
-
     }
 }
