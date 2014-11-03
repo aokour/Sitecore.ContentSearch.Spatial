@@ -82,24 +82,7 @@ namespace Sitecore.ContentSearch.Spatial.Indexing
                     pointFields.Add(f);
                 }
             }
-            //Create storable fields
-            NumericField fieldX = new NumericField(this.fieldNameX, this.precisionStep, Field.Store.YES, false)
-            {
-                OmitNorms = true,
-                OmitTermFreqAndPositions = true
-            };
-            fieldX.SetDoubleValue(lng);
-
-            NumericField fieldY = new NumericField(this.fieldNameY, this.precisionStep, Field.Store.YES, true)
-            {
-                OmitNorms = true,
-                OmitTermFreqAndPositions = true
-            };
-            fieldY.SetDoubleValue(lat);
             
-            pointFields.Add(fieldX);
-            pointFields.Add(fieldY);
-
             return pointFields;
         }
 

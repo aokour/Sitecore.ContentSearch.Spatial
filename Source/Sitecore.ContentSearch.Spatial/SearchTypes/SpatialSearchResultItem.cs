@@ -11,6 +11,9 @@ namespace Sitecore.ContentSearch.Spatial.SearchTypes
     {
         [IndexField(Sitecore.ContentSearch.Spatial.Common.Constants.LocationFieldName)]
         public virtual LocationPoint GeoLocation { get; set; }
+
+        
+
     }
 
     public class LocationPoint

@@ -18,7 +18,7 @@ namespace Sitecore.ContentSearch.Spatial
 
         public static IQueryable<TResult> GetExtendedQueryable<TResult>(this IProviderSearchContext context)
         {
-            return GetExtendedQueryable<TResult>(context, null);
+            return GetExtendedQueryable<TResult>(context, null); 
         }
 
         public static IQueryable<TResult> GetExtendedQueryable<TResult>(this IProviderSearchContext context, params IExecutionContext[] executionContext)

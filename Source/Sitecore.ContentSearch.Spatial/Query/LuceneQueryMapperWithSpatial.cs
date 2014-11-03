@@ -15,6 +15,8 @@ using Spatial4n.Core.Context;
 using Spatial4n.Core.Distance;
 using Spatial4n.Core.Shapes;
 
+using Lucene.Net.Search.Function;
+
 namespace Sitecore.ContentSearch.Spatial.Query
 {
     public class LuceneQueryMapperWithSpatial :LuceneQueryMapper
@@ -47,15 +49,27 @@ namespace Sitecore.ContentSearch.Spatial.Query
                 var distance = DistanceUtils.Dist2Degrees((double)node.Radius, DistanceUtils.EARTH_MEAN_RADIUS_MI);
                 Circle circle = ctx.MakeCircle((double)node.Longitude,(double)node.Latitude, distance);
 
-                var spatialArgs = new SpatialArgs(SpatialOperation.Intersects, circle);
+
+
+                var spatialArgs = new SpatialArgs(SpatialOperation.IsWithin, circle);
                 var dq = strategy.MakeQueryDistanceScore(spatialArgs);
+
+                DistanceReverseValueSource valueSource = new DistanceReverseValueSource(strategy, circle.GetCenter(), distance);
+                ValueSourceFilter vsf = new ValueSourceFilter(new QueryWrapperFilter(dq), valueSource, 0, distance);
+                var filteredSpatial = new FilteredQuery(new MatchAllDocsQuery(), vsf);
+
+                Lucene.Net.Search.Query spatialRankingQuery = new FunctionQuery(valueSource);
+                //var dq = strategy.MakeQueryDistanceScore(spatialArgs);
                 BooleanQuery bq = new BooleanQuery();
 
-                bq.Add(dq, Occur.MUST);
+                bq.Add(filteredSpatial, Occur.MUST);
+                bq.Add(spatialRankingQuery, Occur.MUST);
 
                 return bq;
             }
             throw new NotSupportedException("Wrong parameters type, Radius, latitude and longitude must be of type double");
         }
+
+       
     }
 }

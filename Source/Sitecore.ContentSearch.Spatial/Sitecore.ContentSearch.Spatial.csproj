@@ -71,6 +71,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Common\Constants.cs" />
+    <Compile Include="Common\LuceneExtenesions.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Configurations\SpatialConfigurations.cs" />
     <Compile Include="Indexing\LuceneDocumentBuilder.cs" />
     <Compile Include="Indexing\LinqToLuceneIndexWithSpatial.cs" />
@@ -80,6 +83,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Provider\Lucene\LuceneIndexWithSpatial.cs" />
     <Compile Include="Provider\Lucene\LuceneSearchWithSpatialContext.cs" />
+    <Compile Include="Query\DistanceReverseValueSource.cs" />
     <Compile Include="Query\LuceneQueryMapperWithSpatial.cs" />
     <Compile Include="Query\LuceneQueryOptimizerWithSpatial.cs" />
     <Compile Include="SearchExtensions.cs" />

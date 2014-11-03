@@ -35,6 +35,7 @@ namespace Sitecore.ContentSearch.Spatial.Parsing
             return mappedQuery;
         }
 
+
         public override IQueryable<TQueryElement> CreateQuery<TQueryElement>(Expression expression)
         {
             // use the special generic queryable instance that injects the custom expression parser
