@@ -11,6 +11,8 @@ Supported Queries:
 
 .IsWithinRadius() : This method returns locations within specific circle, results will be sorted based on the distance of the center of circle
 
+Installation and usage description are in this post : http://bit.ly/SitecoreSpatialSearch
+
 More quries and functionalit are to come!
 
 Feel free to join, Fork away!
