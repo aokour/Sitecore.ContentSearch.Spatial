@@ -79,7 +79,6 @@
     <Content Include="sitecore\shell\applications\GeoLocation\Map.aspx" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Sitecore.ContentSearch.Spatial.DataType.config" />
     <None Include="Properties\PublishProfiles\local.pubxml" />
   </ItemGroup>
   <PropertyGroup>
