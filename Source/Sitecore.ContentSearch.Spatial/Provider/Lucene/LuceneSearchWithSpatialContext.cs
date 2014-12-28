@@ -18,11 +18,8 @@ namespace Sitecore.ContentSearch.Spatial.Provider.Lucene
 {
     public class LuceneSearchWithSpatialContext:LuceneSearchContext
     {
-        private Analyzer analyzer;
-        private bool disposed;
         private  ILuceneProviderIndex index;
-        private IndexSearcher searcher;
-        private  SearchSecurityOptions securityOptions;
+     
         private  IContentSearchConfigurationSettings settings;
 
 

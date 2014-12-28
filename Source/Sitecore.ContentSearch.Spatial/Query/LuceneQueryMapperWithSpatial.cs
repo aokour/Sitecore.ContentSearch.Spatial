@@ -51,15 +51,15 @@ namespace Sitecore.ContentSearch.Spatial.Query
 
 
 
-                var spatialArgs = new SpatialArgs(SpatialOperation.IsWithin, circle);
-                var dq = strategy.MakeQueryDistanceScore(spatialArgs);
+                var spatialArgs = new SpatialArgs(SpatialOperation.Intersects, circle);
+                var dq = strategy.MakeQuery(spatialArgs);
 
                 DistanceReverseValueSource valueSource = new DistanceReverseValueSource(strategy, circle.GetCenter(), distance);
                 ValueSourceFilter vsf = new ValueSourceFilter(new QueryWrapperFilter(dq), valueSource, 0, distance);
                 var filteredSpatial = new FilteredQuery(new MatchAllDocsQuery(), vsf);
 
                 Lucene.Net.Search.Query spatialRankingQuery = new FunctionQuery(valueSource);
-                //var dq = strategy.MakeQueryDistanceScore(spatialArgs);
+                
                 BooleanQuery bq = new BooleanQuery();
 
                 bq.Add(filteredSpatial, Occur.MUST);

@@ -24,16 +24,15 @@ namespace Sitecore.ContentSearch.Spatial.Indexing
 {
     public class LuceneSpatialDocumentBuilder : LuceneDocumentBuilder
     {
-        private string fieldNameX;
-        private string fieldNameY;
-        public static string SUFFIX_X = "__lng";
-        public static string SUFFIX_Y = "__ltd";
-        public int precisionStep;
-        private SpatialConfigurations spatialConfigurations;
+        public static int precisionStep;
+        private static SpatialConfigurations spatialConfigurations;
         public LuceneSpatialDocumentBuilder(IIndexable indexable, IProviderUpdateContext context)
             : base(indexable, context)
         {
-            BuildSettings();
+            if (spatialConfigurations == null)
+            {
+                BuildSettings();
+            }
         }
 
         public override void AddItemFields()
@@ -44,7 +43,24 @@ namespace Sitecore.ContentSearch.Spatial.Indexing
             {
                 AddPoint(item).ForEach(i => base.CollectedFields.Enqueue(i));
             }
-            
+            //Integration Geo Location data type
+            if (item.Template.ID.Equals(ID.Parse(Sitecore.ContentSearch.Spatial.Common.Constants.GeoLocationTemplateId)) || item.Template.BaseTemplates.Where(i => i.ID.Equals(ID.Parse(Sitecore.ContentSearch.Spatial.Common.Constants.GeoLocationTemplateId))).Any())
+            {
+                var geoLocationValue = item[Sitecore.ContentSearch.Spatial.Common.Constants.GeoLocationFieldName];
+                if(!string.IsNullOrWhiteSpace(geoLocationValue) && geoLocationValue.IndexOf(',')>=0)
+                {
+                    string ltdString =  geoLocationValue.Split(',')[0];
+                    string lngString = geoLocationValue.Split(',')[1];
+                    double ltd = 0;
+                    double lng = 0;
+                    double.TryParse(ltdString, out ltd);
+                    double.TryParse(lngString, out lng);
+                    if(ltd!=0 && lng != 0)
+                    {
+                        AddPoint(lng, ltd).ForEach(i => base.CollectedFields.Enqueue(i));
+                    }
+                }
+            }
         }
 
         private List<IFieldable> AddPoint(Item item)
@@ -74,6 +90,19 @@ namespace Sitecore.ContentSearch.Spatial.Indexing
             if (lng == 0 || lat == 0)
                 return pointFields;
 
+            pointFields = AddPoint( lng, lat);
+            
+            return pointFields;
+        }
+
+        private static List<IFieldable> AddPoint(double lng, double lat)
+        {
+            SpatialContext ctx =  SpatialContext.GEO;
+             
+            SpatialPrefixTree grid = new GeohashPrefixTree(ctx, 11);
+            var strategy = new PointVectorStrategy(ctx, Sitecore.ContentSearch.Spatial.Common.Constants.LocationFieldName);
+
+            List<IFieldable> pointFields = new List<IFieldable>();
             Point shape = ctx.MakePoint(lng, lat);
             foreach (var f in strategy.CreateIndexableFields(shape))
             {
@@ -82,16 +111,12 @@ namespace Sitecore.ContentSearch.Spatial.Indexing
                     pointFields.Add(f);
                 }
             }
-            
             return pointFields;
         }
 
         private void BuildSettings()
         {
-            this.precisionStep = 8;
-            this.fieldNameX = Sitecore.ContentSearch.Spatial.Common.Constants.LocationFieldName + SUFFIX_X;
-            this.fieldNameY = Sitecore.ContentSearch.Spatial.Common.Constants.LocationFieldName + SUFFIX_Y;
-
+            precisionStep = 8;
             spatialConfigurations = new SpatialConfigurations();
             spatialConfigurations.LocationSettings = new List<LocationSettings>();
             XmlNodeList configs = Factory.GetConfigNodes("contentSearchSpatial/IncludeTemplates/Template");

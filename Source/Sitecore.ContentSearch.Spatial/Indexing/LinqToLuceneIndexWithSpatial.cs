@@ -61,6 +61,8 @@ namespace Sitecore.ContentSearch.Spatial.Indexing
             }
         }
 
+        
+
         protected override IQueryOptimizer QueryOptimizer
         {
             get
