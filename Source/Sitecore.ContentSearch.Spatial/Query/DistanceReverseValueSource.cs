@@ -68,10 +68,17 @@ namespace Sitecore.ContentSearch.Spatial.Query
             public override double DoubleVal(int doc)
             {
                 // make sure it has minX and area
-                if (validX.Get(doc))
+                try
                 {
-                    Debug.Assert(validY.Get(doc));
-                    return calculator.Distance(from, ptX[doc], ptY[doc]);
+                    if (validX.Get(doc))
+                    {
+                        Debug.Assert(validY.Get(doc));
+                        return calculator.Distance(from, ptX[doc], ptY[doc]);
+                    }
+                }
+                catch(Exception ex)
+                {
+
                 }
                 return nullValue;
             }
