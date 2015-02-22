@@ -78,17 +78,19 @@ namespace Sitecore.ContentSearch.Spatial.Indexing
             
             double lng = 0;
             double lat = 0;
+            bool parsedLat = false;
+            bool parsedLong = false;
+
             if (!string.IsNullOrEmpty(item[setting.LatitudeField]))
             {
-                Double.TryParse(item[setting.LatitudeField], out lat);
+                parsedLat = Double.TryParse(item[setting.LatitudeField], out lat);
             }
 
             if (!string.IsNullOrEmpty(item[setting.LongitudeField]))
             {
-                Double.TryParse(item[setting.LongitudeField], out lng);
+                parsedLong = Double.TryParse(item[setting.LongitudeField], out lng);
             }
-
-            if (lng == 0 || lat == 0)
+            if (!parsedLat && !parsedLong)
                 return pointFields;
 
             pointFields = AddPoint( lng, lat);
