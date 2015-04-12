@@ -89,7 +89,12 @@
     <Compile Include="SearchExtensions.cs" />
     <Compile Include="SearchTypes\SpatialSearchResultItem.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\Sitecore.ContentSearch.Spatial.DataTypes\Sitecore.ContentSearch.Spatial.DataTypes.csproj">
+      <Project>{695bb87f-1f33-475d-8123-a177a2af1b86}</Project>
+      <Name>Sitecore.ContentSearch.Spatial.DataTypes</Name>
+    </ProjectReference>
+  </ItemGroup>
   <ItemGroup>
     <None Include="Sitecore.ContentSearch.Spatial.v8.config.disable">
       <SubType>Designer</SubType>
