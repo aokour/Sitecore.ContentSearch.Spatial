@@ -32,7 +32,8 @@ namespace Sitecore.ContentSearch.Spatial
             }
             else
             {
-                throw new NotImplementedException("Current Index is not configured to use Spatial Search.");
+                // TODO: Add Solr Support in future
+                throw new NotImplementedException("Only lucene is supported");
             }
             ;
             return queryable;

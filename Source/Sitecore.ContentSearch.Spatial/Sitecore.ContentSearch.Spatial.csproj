@@ -75,6 +75,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Configurations\SpatialConfigurations.cs" />
+    <Compile Include="Indexing\GeohashComputedField.cs" />
     <Compile Include="Indexing\LuceneDocumentBuilder.cs" />
     <Compile Include="Indexing\LinqToLuceneIndexWithSpatial.cs" />
     <Compile Include="Nodes\WithinRadiusNode.cs" />
@@ -96,9 +97,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Sitecore.ContentSearch.Spatial.v8.config.disable">
-      <SubType>Designer</SubType>
-    </None>
     <None Include="Sitecore.ContentSearch.Spatial.config">
       <SubType>Designer</SubType>
     </None>
