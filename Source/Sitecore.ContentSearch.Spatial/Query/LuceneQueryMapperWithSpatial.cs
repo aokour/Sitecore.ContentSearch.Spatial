@@ -49,22 +49,22 @@ namespace Sitecore.ContentSearch.Spatial.Query
                 var distance = DistanceUtils.Dist2Degrees((double)node.Radius, DistanceUtils.EARTH_MEAN_RADIUS_MI);
                 Circle circle = ctx.MakeCircle((double)node.Longitude,(double)node.Latitude, distance);
 
-
-
-                var spatialArgs = new SpatialArgs(SpatialOperation.Intersects, circle);
+                var spatialArgs = new SpatialArgs(SpatialOperation.IsWithin, circle);
                 var dq = strategy.MakeQuery(spatialArgs);
 
                 DistanceReverseValueSource valueSource = new DistanceReverseValueSource(strategy, circle.GetCenter(), distance);
                 ValueSourceFilter vsf = new ValueSourceFilter(new QueryWrapperFilter(dq), valueSource, 0, distance);
                 var filteredSpatial = new FilteredQuery(new MatchAllDocsQuery(), vsf);
-
+                mappingState.FilterQuery = filteredSpatial;
                 Lucene.Net.Search.Query spatialRankingQuery = new FunctionQuery(valueSource);
-                
+                Random r = new Random(DateTime.Now.Millisecond);
+                var randomNumber = r.Next(10000101,11000101);
+                Lucene.Net.Search.Query dummyQuery = Lucene.Net.Search.NumericRangeQuery.NewIntRange("__smallcreateddate", randomNumber, Int32.Parse(DateTime.Now.ToString("yyyyMMdd")), true, true);
                 BooleanQuery bq = new BooleanQuery();
 
                 bq.Add(filteredSpatial, Occur.MUST);
                 bq.Add(spatialRankingQuery, Occur.MUST);
-
+                bq.Add(dummyQuery, Occur.SHOULD);
                 return bq;
             }
             throw new NotSupportedException("Wrong parameters type, Radius, latitude and longitude must be of type double");
