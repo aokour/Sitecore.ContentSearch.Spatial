@@ -31,30 +31,6 @@ namespace Sitecore.ContentSearch.Spatial.Parsing
            
         }
 
-        private QueryNode GetMethodArgument(MethodCallExpression methodCall, int index)
-        {
-            if (methodCall.Object != null)
-            {
-                index--;
-            }
-            if (index < 0)
-            {
-                return this.Visit(methodCall.Object);
-            }
-            Expression argument = this.GetArgument(methodCall.Arguments, index);
-            return this.Visit(argument);
-        }
-
-        private Expression GetArgument(ReadOnlyCollection<Expression> arguments, int index)
-        {
-            if (arguments.Count < index)
-            {
-                throw new InvalidOperationException(string.Format("Too few arguments ({0}). Tried to access index: {1}", arguments.Count, index));
-            }
-            return arguments[index];
-        }
-
-
         protected QueryNode VisitLocationPointMethods(MethodCallExpression methodCall)
         {
             switch (methodCall.Method.Name)
@@ -68,7 +44,7 @@ namespace Sitecore.ContentSearch.Spatial.Parsing
 
         protected QueryNode VisitWithinRadiusMethod(MethodCallExpression methodCall)
         {
-
+            QueryNode queryNode = this.Visit(this.GetArgument(methodCall.Arguments, 0));
             string fieldKey = this.MapPropertyToField(((MemberExpression)methodCall.Object).Member);
             
             QueryNode nodeLatitude = this.Visit(this.GetArgument(methodCall.Arguments, 0));
@@ -77,30 +53,7 @@ namespace Sitecore.ContentSearch.Spatial.Parsing
             object latitudeValue = this.GetConstantValue<object>(nodeLatitude);
             object longitudeValue = this.GetConstantValue<object>(nodeLongitude);
             object radiusValue = this.GetConstantValue<object>(nodeRadius);
-            return new WithinRadiusNode(fieldKey, latitudeValue, longitudeValue, radiusValue);
+            return new WithinRadiusNode(queryNode, fieldKey, latitudeValue, longitudeValue, radiusValue);
         }
-
-        private T GetConstantValue<T>(QueryNode node)
-        {
-            if (node.NodeType != QueryNodeType.Constant)
-            {
-                throw new InvalidOperationException(string.Format("Node is of type '{0}'. Expected: '{1}'", node.NodeType, QueryNodeType.Constant));
-            }
-            ConstantNode node2 = (ConstantNode)node;
-            if (!node2.Type.IsAssignableTo(typeof(T)))
-            {
-                throw new InvalidOperationException(string.Format("Unexpected constant type '{0}'. Expected '{1}'", node2.Type, typeof(T)));
-            }
-            return (T)node2.Value;
-        }
-
-        private string MapPropertyToField(MemberInfo member)
-        {
-            return this.FieldNameTranslator.GetIndexFieldName(member);
-        }
-
- 
-
-
     }
 }

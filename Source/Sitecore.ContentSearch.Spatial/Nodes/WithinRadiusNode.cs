@@ -15,6 +15,13 @@ namespace Sitecore.ContentSearch.Spatial.Linq.Nodes
         public object Longitude { get; protected set; }
         public object Radius { get; protected set; }
 
+        public QueryNode SourceNode
+        {
+            get;
+            protected set;
+        }
+
+
         public override QueryNodeType NodeType
         {
             get { return QueryNodeType.LessThanOrEqual; }
@@ -28,14 +35,15 @@ namespace Sitecore.ContentSearch.Spatial.Linq.Nodes
             }
         }
 
-        public WithinRadiusNode(string field, object lat, object lng, object withinRadiusinMiles)
-            : this(field,lat, lng, withinRadiusinMiles, 1f)
+        public WithinRadiusNode(QueryNode sourceNode,string field, object lat, object lng, object withinRadiusinMiles)
+            : this(sourceNode, field, lat, lng, withinRadiusinMiles, 1f)
         {
 
         }
 
-        public WithinRadiusNode(string field, object lat, object lng, object withinRadiusinMiles, float boost)
+        public WithinRadiusNode(QueryNode sourceNode, string field, object lat, object lng, object withinRadiusinMiles, float boost)
         {
+            sourceNode = SourceNode;
             Latitude = lat;
             Longitude = lng;
             Radius = withinRadiusinMiles;

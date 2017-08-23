@@ -26,10 +26,12 @@ namespace Sitecore.ContentSearch.Spatial.Query
                 return base.Visit(node, state);
         }
 
-
-        protected virtual Sitecore.ContentSearch.Linq.Nodes.QueryNode VisitWithinRadius(WithinRadiusNode node, LuceneQueryOptimizerState mappingState)
+        protected virtual QueryNode VisitWithinRadius(WithinRadiusNode node, LuceneQueryOptimizerState state)
         {
-            return new WithinRadiusNode(node.Field, node.Latitude, node.Longitude, node.Radius, mappingState.Boost);
+            if(node.SourceNode==null)
+                return new WithinRadiusNode(null, node.Field, node.Latitude, node.Longitude, node.Radius);
+            else
+                return new WithinRadiusNode(this.Visit(node.SourceNode, state), node.Field, node.Latitude, node.Longitude, node.Radius);
         }
     }
 }

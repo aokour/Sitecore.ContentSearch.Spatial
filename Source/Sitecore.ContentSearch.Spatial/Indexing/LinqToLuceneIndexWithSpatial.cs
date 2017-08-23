@@ -12,6 +12,7 @@ using Sitecore.ContentSearch.Linq.Parsing;
 using Sitecore.ContentSearch.LuceneProvider;
 using Sitecore.ContentSearch.Pipelines.GetFacets;
 using Sitecore.ContentSearch.Spatial.Provider.Lucene;
+using Sitecore.ContentSearch.Spatial.Parsing;
 
 namespace Sitecore.ContentSearch.Spatial.Indexing
 {
@@ -25,32 +26,56 @@ namespace Sitecore.ContentSearch.Spatial.Indexing
 
         private LinqToLuceneIndex<TItem> linqToLuceneIndex;
 
-        public LinqToLuceneIndexWithSpatial(LuceneSearchWithSpatialContext context)
-            : this(context, (IExecutionContext[])null)
+        public LinqToLuceneIndexWithSpatial(LuceneSearchContext context) : this(context, new IExecutionContext[1])
         {
-
-            }
-
-        public LinqToLuceneIndexWithSpatial(LuceneSearchWithSpatialContext context, IExecutionContext executionContext)
-            : this (context,new IExecutionContext[] {executionContext}) {
         }
 
-        public LinqToLuceneIndexWithSpatial(LuceneSearchWithSpatialContext context, IExecutionContext[] executionContext)
+        public LinqToLuceneIndexWithSpatial(LuceneSearchContext context, IExecutionContext executionContext) : this(context, new IExecutionContext[] { executionContext })
+        {
+        }
+
+        public LinqToLuceneIndexWithSpatial(LuceneSearchContext context, IExecutionContext[] executionContext)
             : base(context, executionContext)
         {
             this.context = context;
             this.executionContext = executionContext;
+            
 
-            queryMapper = new Sitecore.ContentSearch.Spatial.Query.LuceneQueryMapperWithSpatial(new LuceneIndexParameters(context.Index.Configuration.IndexFieldStorageValueFormatter, ((LuceneIndexConfiguration)context.Index.Configuration).Analyzer, context.Index.Configuration.VirtualFieldProcessors, context.Index.FieldNameTranslator, executionContext));
+            LuceneIndexConfiguration configuration = (LuceneIndexConfiguration)context.Index.Configuration;
+            LuceneIndexParameters luceneIndexParameter = new LuceneIndexParameters(configuration.IndexFieldStorageValueFormatter, configuration.Analyzer, configuration.VirtualFields, context.Index.FieldNameTranslator, executionContext);
+            queryMapper = new Sitecore.ContentSearch.Spatial.Query.LuceneQueryMapperWithSpatial(luceneIndexParameter);
             queryOptimizer = new Sitecore.ContentSearch.Spatial.Query.LuceneQueryOptimizerWithSpatial();
-            linqToLuceneIndex = new LinqToLuceneIndex<TItem>(context, executionContext);
         }
 
         public override IQueryable<TItem> GetQueryable()
         {
-            Sitecore.ContentSearch.Spatial.Parsing.GenericQueryableWithSpatial<TItem, LuceneQuery> genericQueryable = new Sitecore.ContentSearch.Spatial.Parsing.GenericQueryableWithSpatial<TItem, LuceneQuery>(linqToLuceneIndex, QueryMapper, QueryOptimizer, FieldNameTranslator);
+            ExpressionParserWithSpatial expressionParser = new ExpressionParserWithSpatial(typeof(TItem), this.ItemType, this.FieldNameTranslator);
+            IQueryable<TItem> genericQueryable = new GenericQueryableWithSpatial<TItem, LuceneQuery>(this, this.QueryMapper, this.QueryOptimizer, this.FieldNameTranslator, expressionParser);
+      
+            (genericQueryable as IHasTraceWriter).TraceWriter = ((IHasTraceWriter)this).TraceWriter;
+            return this.GetTypeInheritance(typeof(TItem)).SelectMany<Type, IPredefinedQueryAttribute>((Type t) => t.GetCustomAttributes(typeof(IPredefinedQueryAttribute), true).Cast<IPredefinedQueryAttribute>()).Aggregate<IPredefinedQueryAttribute, IQueryable<TItem>>(genericQueryable, (IQueryable<TItem> q, IPredefinedQueryAttribute a) => a.ApplyFilter<TItem>(q, this.ValueFormatter));
+            
+        }
 
-            return genericQueryable;
+        protected object ApplyScalarMethods<TResult, TDocument>(object query, object processedResults, object results)
+        {
+            return (base.GetType().BaseType ?? base.GetType()).GetMethod("ApplyScalarMethods", BindingFlags.Instance | BindingFlags.NonPublic).MakeGenericMethod(new Type[] { typeof(TResult), typeof(TDocument) }).Invoke(this, new object[] { query, processedResults, results });
+        }
+
+        protected object ApplySearchMethods<TElement>(object query, object searchHits)
+        {
+            return (base.GetType().BaseType ?? base.GetType()).GetMethod("ApplySearchMethods", BindingFlags.Instance | BindingFlags.NonPublic).MakeGenericMethod(new Type[] { typeof(TElement) }).Invoke(this, new object[] { query, searchHits });
+        }
+
+        private IEnumerable<Type> GetTypeInheritance(Type type)
+        {
+            Type i;
+            yield return type;
+            for (i = type.BaseType; i != null; i = i.BaseType)
+            {
+                yield return i;
+            }
+            i = null;
         }
 
         protected override QueryMapper<LuceneQuery> QueryMapper

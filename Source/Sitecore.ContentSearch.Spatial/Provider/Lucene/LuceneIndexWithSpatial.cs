@@ -33,7 +33,6 @@ namespace Sitecore.ContentSearch.Spatial.Provider.Lucene
 {
     public class LuceneIndexWithSpatial:LuceneIndex
     {
-        private static SpatialConfigurations spatialConfigurations;
         public LuceneIndexWithSpatial(string name, string folder, IIndexPropertyStore propertyStore)
             :base(name,folder,propertyStore)
         {
@@ -44,5 +43,6 @@ namespace Sitecore.ContentSearch.Spatial.Provider.Lucene
             this.EnsureInitialized();
             return new LuceneSearchWithSpatialContext(this, securityOptions);
         }
+
     }
 }
