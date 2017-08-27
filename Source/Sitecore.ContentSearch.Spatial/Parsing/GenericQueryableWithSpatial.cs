@@ -43,27 +43,6 @@ namespace Sitecore.ContentSearch.Spatial.Parsing
             TQuery tQuery = base.QueryMapper.MapQuery(indexQuery1);
             this.Trace(new GenericDumpable((object)tQuery), "Native query:");
             return tQuery;
-
-            //Trace(expression, "Expression");
-
-            //// here we inject a special expression parser that fixes a few issues slated to be resolved in later releases of SC7
-            //IndexQuery rawQuery = new ExpressionParserWithSpatial(typeof(TElement), ItemType, FieldNameTranslator).Parse(expression);
-
-            //Trace(rawQuery, "Raw query:");
-            //IndexQuery optimizedQuery = QueryOptimizer.Optimize(rawQuery);
-            //Trace(optimizedQuery, "Optimized query:");
-            //TQuery mappedQuery = QueryMapper.MapQuery(optimizedQuery);
-
-            //return mappedQuery;
-
-            //Trace(expression, "Expression");
-            //IndexQuery indexQuery = (new ExpressionParserWithSpatial(typeof(TElement), this.ItemType, this.FieldNameTranslator)).Parse(expression);
-            //this.Trace(indexQuery, "Raw query:");
-            //IndexQuery indexQuery1 = this.QueryOptimizer.Optimize(indexQuery);
-            //this.Trace(indexQuery1, "Optimized query:");
-            //TQuery tQuery = this.QueryMapper.MapQuery(indexQuery1);
-            //this.Trace(new GenericDumpable((object)tQuery), "Native query:");
-            //return tQuery;
         }
         
     }

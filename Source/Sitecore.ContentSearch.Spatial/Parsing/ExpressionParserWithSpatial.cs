@@ -50,10 +50,18 @@ namespace Sitecore.ContentSearch.Spatial.Parsing
             QueryNode nodeLatitude = this.Visit(this.GetArgument(methodCall.Arguments, 0));
             QueryNode nodeLongitude = this.Visit(this.GetArgument(methodCall.Arguments, 1));
             QueryNode nodeRadius = this.Visit(this.GetArgument(methodCall.Arguments, 2));
+            object sortByDistanceValue = (object)true;
+            if (methodCall.Arguments.Count >3)
+            {
+                QueryNode nodesortByDistance = this.Visit(this.GetArgument(methodCall.Arguments, 3));
+                sortByDistanceValue = this.GetConstantValue<object>(nodesortByDistance);
+            }
+            
             object latitudeValue = this.GetConstantValue<object>(nodeLatitude);
             object longitudeValue = this.GetConstantValue<object>(nodeLongitude);
             object radiusValue = this.GetConstantValue<object>(nodeRadius);
-            return new WithinRadiusNode(queryNode, fieldKey, latitudeValue, longitudeValue, radiusValue);
+            
+            return new WithinRadiusNode(queryNode, fieldKey, latitudeValue, longitudeValue, radiusValue, sortByDistanceValue);
         }
     }
 }

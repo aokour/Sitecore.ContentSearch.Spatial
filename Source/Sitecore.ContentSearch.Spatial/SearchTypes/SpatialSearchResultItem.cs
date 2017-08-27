@@ -21,11 +21,23 @@ namespace Sitecore.ContentSearch.Spatial.SearchTypes
         /// <param name="latitude">Latitude of the search point</param>
         /// <param name="longitude">Logitude of the search point</param>
         /// <param name="distance">distance im miles</param>
+        /// <param name="orderByDistance">If true, Sort results from nearest to farthest</param>
+        /// <returns></returns>
+        public bool WithinRadius(double latitude, double longitude, double distance, bool orderByDistance)
+        {
+            return true;
+        }
+
+        /// <summary>
+        /// Search results within radius of a specific point
+        /// </summary>
+        /// <param name="latitude">Latitude of the search point</param>
+        /// <param name="longitude">Logitude of the search point</param>
+        /// <param name="distance">distance im miles</param>
         /// <returns></returns>
         public bool WithinRadius(double latitude, double longitude, double distance)
         {
             return true;
         }
-
     }
 }
