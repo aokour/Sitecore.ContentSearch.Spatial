@@ -100,6 +100,7 @@
     <Compile Include="Parsing\ExpressionParserWithSpatial.cs" />
     <Compile Include="Parsing\GenericQueryableWithSpatial.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Provider\Lucene\LuceneIndexWithSpatialSwitchOnRebuild.cs" />
     <Compile Include="Provider\Lucene\LuceneIndexWithSpatial.cs" />
     <Compile Include="Provider\Lucene\LuceneSearchWithSpatialContext.cs" />
     <Compile Include="Query\DistanceValueSource.cs" />
